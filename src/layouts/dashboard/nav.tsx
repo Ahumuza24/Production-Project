@@ -39,8 +39,9 @@ export function NavDesktop({
   return (
     <Box
       sx={{
-        pt: 2.5,
+        pt: -10,
         px: 2.5,
+        pb: 2,
         top: 0,
         left: 0,
         height: 1,
@@ -85,8 +86,9 @@ export function NavMobile({
       onClose={onClose}
       sx={{
         [`& .${drawerClasses.paper}`]: {
-          pt: 2.5,
+          pt: 1.5,
           px: 2.5,
+          pb: 2,
           overflow: 'unset',
           width: 'var(--layout-nav-mobile-width)',
           ...sx,
@@ -105,7 +107,10 @@ export function NavContent({ data, slots, sx }: NavContentProps) {
 
   return (
     <>
-      <Logo />
+      {/* Logo with minimal top spacing */}
+      <Box sx={{ mb: -5}}>
+        <Logo />
+      </Box>
 
       {slots?.topArea}
 
@@ -124,9 +129,13 @@ export function NavContent({ data, slots, sx }: NavContentProps) {
           <Box
             component="ul"
             sx={{
-              gap: 0.5,
+              gap: 1,
               display: 'flex',
               flexDirection: 'column',
+              px: 0,
+              py: 0,
+              m: 0,
+              listStyle: 'none',
             }}
           >
             {data.map((item) => {
@@ -141,14 +150,20 @@ export function NavContent({ data, slots, sx }: NavContentProps) {
                     sx={[
                       (theme) => ({
                         pl: 2,
-                        py: 1,
+                        py: 1.25,
                         gap: 2,
                         pr: 1.5,
-                        borderRadius: 0.75,
+                        borderRadius: 1,
                         typography: 'body2',
                         fontWeight: 'fontWeightMedium',
                         color: theme.vars.palette.text.secondary,
-                        minHeight: 44,
+                        minHeight: 48,
+                        transition: theme.transitions.create(['background-color', 'color'], {
+                          duration: theme.transitions.duration.shorter,
+                        }),
+                        '&:hover': {
+                          bgcolor: varAlpha(theme.vars.palette.grey['500Channel'], 0.08),
+                        },
                         ...(isActived && {
                           fontWeight: 'fontWeightSemiBold',
                           color: theme.vars.palette.primary.main,
