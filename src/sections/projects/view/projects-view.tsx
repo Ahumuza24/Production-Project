@@ -79,30 +79,30 @@ export function ProjectsView() {
         </Box>
       )}
 
-      {/* Projects Table */}
-      <Card>
-        <CardContent>
-          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
-            <Typography variant="h6">
-              All Projects ({projects.length})
-            </Typography>
-            <Box sx={{ display: 'flex', gap: 1 }}>
-              <Button
-                size="small"
-                startIcon={<Iconify icon="solar:chart-bold" />}
-                onClick={() => setSelectedProjectId(selectedProjectId ? null : projects[0]?.id)}
-              >
-                {selectedProjectId ? 'Hide Analytics' : 'Show Analytics'}
-              </Button>
+      {/* Projects Table or Empty State */}
+      {projects.length > 0 || showCreateForm ? (
+        <Card>
+          <CardContent>
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
+              <Typography variant="h6">
+                All Projects ({projects.length})
+              </Typography>
+              <Box sx={{ display: 'flex', gap: 1 }}>
+                <Button
+                  size="small"
+                  startIcon={<Iconify icon="solar:chart-bold" />}
+                  onClick={() => setSelectedProjectId(selectedProjectId ? null : projects[0]?.id)}
+                >
+                  {selectedProjectId ? 'Hide Analytics' : 'Show Analytics'}
+                </Button>
+              </Box>
             </Box>
-          </Box>
-          
-          <TableContainer sx={{ overflow: 'unset' }}>
-            <Table sx={{ minWidth: 800 }}>
-              <UserTableHead headLabel={TABLE_HEAD} rowCount={projects.length} />
-              <TableBody>
-                {projects.length > 0 ? (
-                  projects.map((row) => (
+            
+            <TableContainer sx={{ overflow: 'unset' }}>
+              <Table sx={{ minWidth: 800 }}>
+                <UserTableHead headLabel={TABLE_HEAD} rowCount={projects.length} />
+                <TableBody>
+                  {projects.map((row) => (
                     <ProjectTableRow
                       key={row.id}
                       row={row}
@@ -110,29 +110,84 @@ export function ProjectsView() {
                       onSelectRow={() => {}}
                       onViewAnalytics={handleViewAnalytics}
                     />
-                  ))
-                ) : (
-                  <Box sx={{ p: 4, textAlign: 'center' }}>
-                    <Typography variant="h6" sx={{ mb: 1, color: 'text.secondary' }}>
-                      No projects yet
-                    </Typography>
-                    <Typography variant="body2" sx={{ color: 'text.secondary', mb: 2 }}>
-                      Create your first project to get started with FundiBots manufacturing
-                    </Typography>
-                    <Button
-                      variant="contained"
-                      startIcon={<Iconify icon="solar:pen-bold" />}
-                      onClick={() => setShowCreateForm(true)}
-                    >
-                      Create First Project
-                    </Button>
-                  </Box>
-                )}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </CardContent>
-      </Card>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </CardContent>
+        </Card>
+      ) : (
+        <Box 
+          sx={{ 
+            minHeight: '60vh',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            textAlign: 'center',
+            px: 4,
+            gap: 3
+          }}
+        >
+          <Box
+            sx={{
+              width: 80,
+              height: 80,
+              borderRadius: '50%',
+              bgcolor: 'primary.lighter',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
+          >
+            <Iconify 
+              icon="solar:pen-bold" 
+              width={40} 
+              sx={{ color: 'primary.main' }}
+            />
+          </Box>
+          <Typography 
+            variant="h4" 
+            sx={{ 
+              fontWeight: 600,
+              maxWidth: 600,
+              mx: 'auto'
+            }}
+          >
+            No projects yet
+          </Typography>
+          <Typography 
+            variant="body1" 
+            sx={{ 
+              color: 'text.secondary',
+              maxWidth: 700,
+              mx: 'auto',
+              lineHeight: 1.6,
+              fontSize: '1.1rem'
+            }}
+          >
+            Get started by creating your first FundiBots manufacturing project to track components, manage work sessions, and monitor progress all in one place.
+          </Typography>
+          <Button
+            variant="contained"
+            size="large"
+            startIcon={<Iconify icon="solar:pen-bold" />}
+            onClick={() => setShowCreateForm(true)}
+            sx={{
+              px: 8,
+              py: 2,
+              borderRadius: 2,
+              textTransform: 'none',
+              fontSize: '1.1rem',
+              fontWeight: 600,
+              minWidth: 280,
+              mt: 1
+            }}
+          >
+            Create Your First Project
+          </Button>
+        </Box>
+      )}
     </Container>
   );
 }

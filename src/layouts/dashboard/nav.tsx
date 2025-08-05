@@ -108,7 +108,7 @@ export function NavContent({ data, slots, sx }: NavContentProps) {
   return (
     <>
       {/* Logo with minimal top spacing */}
-      <Box sx={{ mb: -5}}>
+      <Box sx={{ mb: -5 }}>
         <Logo />
       </Box>
 
