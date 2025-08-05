@@ -1,0 +1,66 @@
+
+import type { CardProps } from '@mui/material/Card';
+import type { ChartOptions } from 'src/components/chart';
+
+import Card from '@mui/material/Card';
+import CardHeader from '@mui/material/CardHeader';
+import { useTheme, alpha as hexAlpha } from '@mui/material/styles';
+
+import { useAuth } from 'src/hooks/useAuth';
+
+import { useAssemblerAnalytics } from 'src/hooks/useAssemblerAnalytics';
+
+
+
+import { Chart, useChart } from 'src/components/chart';
+
+
+
+// ----------------------------------------------------------------------
+
+type Props = CardProps & {
+  title?: string;
+  subheader?: string;
+};
+
+export function AssemblerPerformanceChart({ title, subheader, sx, ...other }: Props) {
+  const theme = useTheme();
+  const { user } = useAuth();
+  const { assemblerPerformance } = useAssemblerAnalytics(user?.id || '');
+
+  const chartColors = [hexAlpha(theme.palette.primary.dark, 0.8)];
+
+  const chartOptions = useChart({
+    colors: chartColors,
+    stroke: { width: 2, colors: ['transparent'] },
+    xaxis: { categories: assemblerPerformance.map((p) => new Date(p.created_at).toLocaleDateString()) },
+    legend: { show: false },
+    tooltip: { y: { formatter: (value: number) => `${value} parts` } },
+  });
+
+  const series = [
+    {
+      name: 'Parts Completed',
+      data: assemblerPerformance.map((p) => p.parts_completed),
+    },
+  ];
+
+  return (
+    <Card sx={sx} {...other}>
+      <CardHeader title={title} subheader={subheader} />
+
+      <Chart
+        type="bar"
+        series={series}
+        options={chartOptions}
+        slotProps={{ loading: { p: 2.5 } }}
+        sx={{
+          pl: 1,
+          py: 2.5,
+          pr: 2.5,
+          height: 364,
+        }}
+      />
+    </Card>
+  );
+}
