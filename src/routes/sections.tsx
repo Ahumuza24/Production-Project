@@ -23,6 +23,7 @@ export const SignUpPage = lazy(() => import('src/pages/sign-up'));
 export const ProjectLeadDashboardPage = lazy(() => import('src/pages/ProjectLeadDashboard'));
 export const AssemblerDashboardPage = lazy(() => import('src/pages/AssemblerDashboard'));
 export const WorkHistoryPage = lazy(() => import('src/pages/WorkHistoryPage'));
+export const ProjectsPage = lazy(() => import('src/pages/ProjectsPage'));
 
 const renderFallback = () => (
   <Box
@@ -81,6 +82,14 @@ export const routesSection: RouteObject[] = [
         element: (
           <ProtectedRoute requiredRole="assembler">
             <AssemblerDashboardPage />
+          </ProtectedRoute>
+        ) 
+      },
+      { 
+        path: 'projects', 
+        element: (
+          <ProtectedRoute requiredRole="project_lead">
+            <ProjectsPage />
           </ProtectedRoute>
         ) 
       },

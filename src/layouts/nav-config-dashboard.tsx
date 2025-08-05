@@ -21,7 +21,7 @@ export const navData = [
   },
   {
     title: 'Projects',
-    path: '/dashboard',
+    path: '/projects',
     icon: <Iconify icon="solar:pen-bold" />,
   },
   {

@@ -9,13 +9,21 @@ import IconButton from '@mui/material/IconButton';
 import { Iconify } from 'src/components/iconify';
 
 import { supabase } from 'src/lib/supabase';
+import { useAuth } from 'src/hooks/useAuth';
 
 
 
-export function CreateProjectForm() {
+interface CreateProjectFormProps {
+  onSuccess?: () => void;
+  onCancel?: () => void;
+}
+
+export function CreateProjectForm({ onSuccess, onCancel }: CreateProjectFormProps) {
+  const { user } = useAuth();
   const [projectName, setProjectName] = useState('');
   const [totalQuantity, setTotalQuantity] = useState(0);
   const [components, setComponents] = useState([{ name: '', quantity_per_unit: 1 }]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleAddComponent = () => {
     setComponents([...components, { name: '', quantity_per_unit: 1 }]);
@@ -35,28 +43,51 @@ export function CreateProjectForm() {
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const { data: projectData, error: projectError } = await supabase
-      .from('projects')
-      .insert([{ name: projectName, total_quantity: totalQuantity }])
-      .select();
+    setIsSubmitting(true);
 
-    if (projectError) {
-      console.error('Error creating project:', projectError);
-      return;
-    }
+    try {
+      if (!user?.id) {
+        alert('You must be logged in to create a project');
+        return;
+      }
 
-    const projectId = projectData[0].id;
-    const componentData = components.map((c) => ({ ...c, project_id: projectId }));
+      const { data: projectData, error: projectError } = await supabase
+        .from('projects')
+        .insert([{ 
+          name: projectName, 
+          total_quantity: totalQuantity,
+          created_by: user.id
+        }])
+        .select();
 
-    const { error: componentError } = await supabase.from('components').insert(componentData);
+      if (projectError) {
+        console.error('Error creating project:', projectError);
+        alert(`Error creating project: ${projectError.message}`);
+        return;
+      }
 
-    if (componentError) {
-      console.error('Error creating components:', componentError);
-    } else {
-      console.log('Project and components created:');
-      setProjectName('');
-      setTotalQuantity(0);
-      setComponents([{ name: '', quantity_per_unit: 1 }]);
+      const projectId = projectData[0].id;
+      const componentData = components.map((c) => ({ ...c, project_id: projectId }));
+
+      const { error: componentError } = await supabase.from('components').insert(componentData);
+
+      if (componentError) {
+        console.error('Error creating components:', componentError);
+        alert(`Error creating components: ${componentError.message}`);
+      } else {
+        console.log('Project and components created successfully');
+        // Reset form
+        setProjectName('');
+        setTotalQuantity(0);
+        setComponents([{ name: '', quantity_per_unit: 1 }]);
+        // Call success callback
+        onSuccess?.();
+      }
+    } catch (error) {
+      console.error('Unexpected error:', error);
+      alert('An unexpected error occurred. Please try again.');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -109,10 +140,19 @@ export function CreateProjectForm() {
           </IconButton>
         </Box>
       ))}
-      <Button onClick={handleAddComponent}>Add Component</Button>
-      <Button type="submit" variant="contained">
-        Create Project
+      <Button onClick={handleAddComponent} disabled={isSubmitting}>
+        Add Component
       </Button>
+      <Box sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end' }}>
+        {onCancel && (
+          <Button onClick={onCancel} disabled={isSubmitting}>
+            Cancel
+          </Button>
+        )}
+        <Button type="submit" variant="contained" disabled={isSubmitting}>
+          {isSubmitting ? 'Creating...' : 'Create Project'}
+        </Button>
+      </Box>
     </Box>
   );
 }
